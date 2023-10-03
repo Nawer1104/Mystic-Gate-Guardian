@@ -2,68 +2,61 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
 
-    public List<Level> levels;
+    public int soldierDamage = 1;
 
-    private int startIndex = 0;
+    public int updateDamagedCost = 100;
 
-    private int currentIndex;
+    public TextMeshProUGUI soldierDamgeText;
 
+    public TextMeshProUGUI soldierDamgeUpdateText;
+
+    public TextMeshProUGUI playerCoinText;
+
+    public int coin = 0;
+
+    public float spawnTime = 2f;
     private void Awake()
     {
         if (Instance == null)
         {
             Instance = this;
         }
-
-        currentIndex = startIndex;
-
-        levels[currentIndex].gameObject.SetActive(true);
     }
 
-    public int GetCurrentIndex()
-    {
-        return currentIndex;
-    }
-
-    public void CheckLevelUp()
-    {
-        if (levels[currentIndex].gameObjects.Count == 0)
-        {
-            
-            currentIndex += 1;
-
-            StartCoroutine(LevelUp());
-        }
-    }
-
-    public void ResetGame()
+    public void ReSetGame()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
-    IEnumerator LevelUp()
+    private void SetText()
     {
-        yield return new WaitForSeconds(2);
+        soldierDamgeText.SetText("Soldier damaged: {0}", soldierDamage);
 
-        levels[currentIndex-1].gameObject.SetActive(false);
+        soldierDamgeUpdateText.SetText("Soldier update cost: {0}", updateDamagedCost);
 
-        if (currentIndex >= levels.Count)
-        {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-
-            currentIndex = 0;
-        }
-
-        levels[currentIndex].gameObject.SetActive(true);
+        playerCoinText.SetText("Coin: {0}", coin);
     }
 
-    public void ReSetCurrentLevel()
+    private void Update()
     {
-        //levels[currentIndex].AddComponents();
+        SetText();
+    }
+
+    public void UpdateSoldier()
+    {
+        if (coin >= updateDamagedCost)
+        {
+            soldierDamage += 1;
+
+            spawnTime -= 0.1f;
+
+            coin -= updateDamagedCost;
+        }
     }
 }
